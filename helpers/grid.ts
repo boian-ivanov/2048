@@ -1,9 +1,10 @@
-type Position = 'LEFT' | 'RIGHT' | 'UP' | 'DOWN';
+type Position = 'LEFT' | 'RIGHT';
 
 export default class Grid<Grid> {
     grid: number[][] = [];
     score: number = 0;
     gameOver: boolean = false;
+    gameWon: boolean = false;
 
     constructor(public rows: number, public columns: number) {
         // create an empty grid
@@ -58,6 +59,10 @@ export default class Grid<Grid> {
         return this.gameOver;
     }
 
+    isGameWon(): boolean {
+        return this.gameWon;
+    }
+
     static removeNullsFromRow(row: number[]): number[] {
         return row.filter((item) => item !== null);
     }
@@ -91,13 +96,26 @@ export default class Grid<Grid> {
         return row;
     }
 
-    private addNumsInRow(row: number[]): number[] {
+    private checkFor2048(num: number): void {
+        if (num === 2048) {
+            this.gameWon = true;
+        }
+    }
+
+    private addNumsInRow(row: number[], position: Position): number[] {
+        if (position === 'RIGHT') {
+            row = row.reverse();
+        }
         for (let i = 0; i < row.length; i++) {
             if (row[i] === row[i + 1]) {
                 row[i] = row[i] + row[i + 1];
                 row.splice(i + 1, 1);
                 this.updateScore(row[i]);
+                this.checkFor2048(row[i]);
             }
+        }
+        if (position === 'RIGHT') {
+            row = row.reverse();
         }
         return row;
     }
@@ -105,7 +123,7 @@ export default class Grid<Grid> {
     private moveLeft(): void {
         this.grid.forEach((row, index, array) => {
             let filteredRow = Grid.removeNullsFromRow(row);
-            filteredRow = this.addNumsInRow(filteredRow);
+            filteredRow = this.addNumsInRow(filteredRow, 'LEFT');
             filteredRow = this.addNullsToRow(filteredRow, 'LEFT');
             array[index] = filteredRow;
         });
@@ -114,7 +132,7 @@ export default class Grid<Grid> {
     private moveRight(): void {
         this.grid.forEach((row, index, array) => {
             let filteredRow = Grid.removeNullsFromRow(row);
-            filteredRow = this.addNumsInRow(filteredRow);
+            filteredRow = this.addNumsInRow(filteredRow, 'RIGHT');
             filteredRow = this.addNullsToRow(filteredRow, 'RIGHT');
             array[index] = filteredRow;
         });
