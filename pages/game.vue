@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import GameInstance from "~/components/GameInstance.vue";
 
 // initialize a grid of 6x6 cells
@@ -10,6 +10,10 @@ const hasLost = ref(false);
 const score = ref(0);
 
 const restartGame = () => window.location.reload();
+
+onMounted(() => {
+    document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive:false });
+})
 </script>
 
 <template>
