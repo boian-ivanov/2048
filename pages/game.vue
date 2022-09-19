@@ -6,9 +6,9 @@ import Grid from "~/helpers/grid";
 // initialize a grid of 6x6 cells
 let gridSize = 6;
 const gridObject = reactive(new Grid(gridSize, gridSize));
-gridObject.init();
 let grid = computed(() => gridObject.get());
 
+// add swipe actions
 const el = ref(null);
 const { isSwiping, direction } = usePointerSwipe(el, {
     onSwipeEnd(e: PointerEvent, direction: SwipeDirection) {
