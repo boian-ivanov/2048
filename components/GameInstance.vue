@@ -1,29 +1,61 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import Grid from "~/helpers/grid";
 import { SwipeDirection, usePointerSwipe } from "@vueuse/core";
 
 const props = defineProps<{
     gridSize: number,
     id?: number,
+    reset?: boolean,
 }>()
 
 const emit = defineEmits<{
     (e: 'won', value: boolean): void
     (e: 'lost', value: boolean): void
     (e: 'score', value: number): void
+    (e: 'update:reset', value: boolean): void
 }>()
 
-const gridObject = reactive(new Grid(props.gridSize, props.gridSize));
-let grid = computed(() => gridObject.get());
+const data = reactive({
+    gridObject: {
+        grid: Grid.createEmptyGrid(props.gridSize, props.gridSize),
+        getScore: () => 0,
+        isGameWon: () => false,
+        isGameOver: () => false,
+        move: () => {
+        },
+    } as Grid,
+});
 
-watch(gridObject, () => {
-    emit('score', gridObject.getScore());
-    if (gridObject.isGameWon()) {
-        emit('won', true);
+onMounted(() => {
+    if (localStorage.getItem('grid')) { // todo: use id for different sessions `grid-${props.id}`
+        data.gridObject = new Grid(props.gridSize, props.gridSize, localStorage.getItem('grid') as string);
+    } else {
+        data.gridObject = new Grid(props.gridSize, props.gridSize);
     }
-    if (gridObject.isGameOver()) {
-        emit('lost', true);
+
+    watch(data.gridObject, () => {
+        emit('score', data.gridObject.getScore());
+        localStorage.setItem('grid', JSON.stringify({
+            grid: data.gridObject.grid,
+            score: data.gridObject.getScore(),
+        }));
+        if (data.gridObject.isGameWon()) {
+            emit('won', true);
+            localStorage.removeItem('grid');
+        }
+        if (data.gridObject.isGameOver()) {
+            emit('lost', true);
+            localStorage.removeItem('grid');
+        }
+    });
+});
+
+watch(() => props.reset, (value) => {
+    if (value) {
+        localStorage.removeItem('grid');
+        data.gridObject = new Grid(props.gridSize, props.gridSize);
+        emit('update:reset', false);
     }
 });
 
@@ -31,7 +63,7 @@ watch(gridObject, () => {
 const el = ref(null);
 const { isSwiping, direction } = usePointerSwipe(el, {
     onSwipeEnd(e: PointerEvent, direction: SwipeDirection) {
-        gridObject.move(direction);
+        data.gridObject.move(direction);
     },
 });
 </script>
@@ -39,7 +71,7 @@ const { isSwiping, direction } = usePointerSwipe(el, {
 <template>
     <div>
         <div class="score">
-            <div class="text-2xl">Score : {{ gridObject.getScore() }}</div>
+            <div class="text-2xl">Score : {{ data.gridObject.getScore() }}</div>
         </div>
         <div
             ref="el"
@@ -47,7 +79,7 @@ const { isSwiping, direction } = usePointerSwipe(el, {
         >
             <div class="grid-container gap-1">
                 <div
-                    v-for="(row, i) in grid"
+                    v-for="(row, i) in data.gridObject.grid"
                     :key="`row-${i}`"
                     class="row grid grid-cols-6 gap-1 mb-1"
                 >

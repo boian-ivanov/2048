@@ -8,6 +8,7 @@ let gridSize = 6;
 const hasWon = ref(false);
 const hasLost = ref(false);
 const score = ref(0);
+const reset = ref(false);
 
 const restartGame = () => window.location.reload();
 
@@ -54,7 +55,7 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <div class="w-full h-full flex flex-col justify-center items-center relative z-20">
+        <div class="w-full h-full flex flex-col justify-center items-center relative">
             <div class="flex flex-col mb-1">
                 <span class="text-indigo-500 text-4xl text-center">2048</span>
             </div>
@@ -62,8 +63,12 @@ onMounted(() => {
                 @won="hasWon = true"
                 @lost="hasLost = true"
                 @score="score = $event"
+                v-model:reset="reset"
                 :gridSize="gridSize"
             />
+        </div>
+        <div class="w-full h-full flex flex-col justify-center items-center relative mt-20">
+            <button class="px-4 py-2 text-white bg-red-700 rounded" @click="reset = true">Restart</button>
         </div>
     </div>
 </template>

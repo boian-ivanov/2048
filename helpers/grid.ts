@@ -6,10 +6,13 @@ export default class Grid<Grid> {
     gameOver: boolean = false;
     gameWon: boolean = false;
 
-    constructor(public rows: number, public columns: number) {
-        // create an empty grid
-        this.grid = Array(rows).fill(null).map(() => Array(columns).fill(null));
-        this.init();
+    constructor(public rows: number, public columns: number, withGrid?: string) {
+        if (withGrid) {
+            this.grid = this.fromJSON(withGrid);
+        } else {
+            this.grid = Grid.createEmptyGrid(rows, columns);
+            this.init();
+        }
     }
 
     init(): void {
@@ -61,6 +64,16 @@ export default class Grid<Grid> {
 
     isGameWon(): boolean {
         return this.gameWon;
+    }
+
+    fromJSON(data: string): number[][] {
+        let { grid, score } = JSON.parse(data);
+        this.score = score;
+        return grid;
+    }
+
+    static createEmptyGrid(rows: number, columns: number): number[][] {
+        return Array(rows).fill(null).map(() => Array(columns).fill(null));
     }
 
     static removeNullsFromRow(row: number[]): number[] {
