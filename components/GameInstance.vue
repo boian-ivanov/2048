@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref, watch } from "vue";
 import Grid from "~/helpers/grid";
 import { SwipeDirection, usePointerSwipe } from "@vueuse/core";
+import { vAutoAnimate } from '@formkit/auto-animate';
 
 const props = defineProps<{
     gridSize: number,
@@ -52,7 +53,7 @@ onMounted(() => {
 });
 
 watch(() => props.reset, (value) => {
-    if (value) {
+    if (value === true) {
         localStorage.removeItem('grid');
         data.gridObject = new Grid(props.gridSize, props.gridSize);
         emit('update:reset', false);
@@ -87,8 +88,15 @@ const { isSwiping, direction } = usePointerSwipe(el, {
                         v-for="(value, j) in row"
                         :key="`${i}-${j}`"
                         :class="`col w-12 h-12 rounded flex items-center justify-center tile-${value}`"
+                        v-auto-animate
                     >
-                        <div class="text-2xl text-white select-none">{{ value }}</div>
+                        <div
+                            v-if="value"
+                            :key="`tile-${i}-${j}-${value}`"
+                            class="text-2xl text-white select-none"
+                        >
+                            {{ value }}
+                        </div>
                     </div>
                 </div>
             </div>
