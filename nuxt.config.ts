@@ -1,4 +1,6 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
+import functions from "./sockets/index";
+
 export default defineNuxtConfig({
     build: {
         postcss: {
@@ -6,6 +8,14 @@ export default defineNuxtConfig({
         },
     },
     modules: [
-        '@nuxtjs/tailwindcss'
+        '@nuxtjs/tailwindcss',
+        'nuxt-internal-socket',
     ],
+    socketIO: {
+        socketFunctions: functions,
+        clientOptions: {
+            uri: "/",
+            managerOptions: {},
+        },
+    },
 })
