@@ -6,6 +6,15 @@ export default defineNuxtConfig({
         },
     },
     modules: [
-        '@nuxtjs/tailwindcss'
+        '@nuxtjs/tailwindcss',
+        '@nuxtjs/pwa',
     ],
+    pwa: {
+        manifest: {
+            name: '2048 Nuxt Game',
+            short_name: '2048',
+            lang: 'en',
+            display: 'standalone',
+        }
+    },
 })
